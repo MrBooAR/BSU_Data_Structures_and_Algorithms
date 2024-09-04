@@ -1,0 +1,41 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+void DFS(int index,int &count, vector<vector<int>> m1, vector<bool>& vis, vector<int>& res) {
+	vis[index] = true;
+	res[index] = count;
+	count++;
+	for (int j = 0;j < m1[index].size();j++) {
+		if (m1[index][j] == 1 && vis[j] == false) {
+			DFS(j, count, m1, vis, res);
+		}
+	}
+}
+int main() {
+	int count = 1;
+	int n;
+	fin >> n;
+	vector<vector<int>> matrix;
+	for (int i = 0;i < n;i++) {
+		vector<int> onetemple;
+		for (int j = 0;j < n;j++) {
+			int tmp;
+			fin >> tmp;
+			onetemple.push_back(tmp);
+		}
+		matrix.push_back(onetemple);
+	}
+	vector<bool> arrvis(n, false);
+	vector<int> arrres(n, 0);
+	for (int i = 0;i < n;i++) {
+		if (arrvis[i] == false) {
+			DFS(i, count, matrix, arrvis, arrres);
+		}
+	}
+	for (int i = 0;i < arrres.size();i++) {
+		fout << arrres[i] << " ";
+	}
+}
