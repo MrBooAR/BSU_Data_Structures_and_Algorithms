@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+//long long modPow(long long a)
+//{
+//	long long b = 1;
+//	int k = 1000000000 + 5;
+//	int mod = 1000000000 + 7;
+//
+//	while (k) {
+//		if (k % 2 == 1) {
+//			b = (b * a) % mod;
+//		}
+//		k /= 2;
+//		a = (a * a) % mod;
+//	}
+//
+//	return b;
+//}
+long long modPow(long long x, long long p, long long number) {
+	if (p == 1) {
+		return x;
+	}
+
+	if (p % 2 == 0) {
+		long long t = modPow(x, p / 2, number);
+		return t * t % number;
+	}
+	else {
+		return modPow(x, p - 1, number) * x % number;
+	}
+}
+int main() {
+	long long k, n;
+	cin >> n;
+	cin >> k;
+	long long ch = 1;
+	long  long zn = 1;
+	for (long long i = k + 1; i <= n;i++) {
+		ch *= i;
+		ch %= (1000000007);
+	}
+	for (long i = 1;i <= n - k;i++) {
+		zn *= i;
+		zn %= (1000000007);
+	}
+	long long res;
+	res = modPow(zn, 1000000005, 1000000007);
+	res = ch * res % 1000000007;
+	cout << res;
+}
