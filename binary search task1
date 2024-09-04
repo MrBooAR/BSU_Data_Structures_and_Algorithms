@@ -1,0 +1,71 @@
+#include <iostream>
+using namespace std;
+struct bin
+{
+    long long find;
+    long long indexhe;
+    long long indexhigh;
+};
+int lowerboundf(long long* arr, long long key, long long size) {
+    if (arr[size - 1] < key) {
+        return size;
+    }
+    long long low = 0, high = size - 1;
+    while (low <= high) {
+        long long mid = (low + high) / 2;
+        if (arr[mid] >= key) {
+            high = mid - 1;
+        }
+        else {
+            low = mid + 1;
+        }
+    }
+    return low;
+}
+int upperboundf(long long* arr, long long key, long long size) {
+    if (arr[size - 1] < key) {
+        return size;
+    }
+    long long low = 0, high = size - 1;
+    while (low <= high) {
+        long long mid = (low + high) / 2;
+        if (arr[mid] > key) {
+            high = mid - 1;
+        }
+        else {
+            low = mid + 1;
+        }
+    }
+    return low;
+}
+
+int main() {
+    long long size;
+    cin >> size;
+    long long* mainarr = new long long[size];
+    for (int i = 0;i < size;i++) {
+        cin >> mainarr[i];
+    }
+
+    long long sizereq;
+    cin >> sizereq;
+    long long* reqarr = new long long[sizereq];
+    for (int i = 0;i < sizereq;i++) {
+        cin >> reqarr[i];
+    }
+    bin res;
+    for (int i = 0;i < sizereq;i++) {
+        res.indexhe = lowerboundf(mainarr, reqarr[i], size);
+        res.indexhigh = upperboundf(mainarr, reqarr[i], size);
+        if ((res.indexhigh - res.indexhe) == 0) {
+            res.find = 0;
+        }
+        else {
+            res.find = 1;
+        }
+        cout << res.find << " " << res.indexhe << " " << res.indexhigh << endl;
+    }
+    delete[] mainarr;
+    delete[] reqarr;
+    return 0;
+}
