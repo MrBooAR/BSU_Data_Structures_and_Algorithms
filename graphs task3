@@ -1,0 +1,47 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+struct pairxy
+{
+    int x;
+    int y;
+    pairxy() {
+        x = 0;
+        y = 0;
+    }
+    pairxy(int n1, int m1) {
+        x = n1;
+        y = m1;
+    }
+};
+int main() {
+    int n, m;
+    fin >> n >> m;
+    vector<vector<int>> vect;
+    for (int i = 0;i < n;i++) {
+        vector<int> oneTemple;
+        oneTemple.push_back(0);
+        vect.push_back(oneTemple);
+    }
+    pairxy* arr = new pairxy[m];
+    for (int i = 0;i < m;i++) {
+        fin >> arr[i].x >> arr[i].y;
+    }
+    for (int i = 0;i < m;i++) {
+        vect[arr[i].x - 1].push_back(arr[i].y);
+        vect[arr[i].y - 1].push_back(arr[i].x);
+        vect[arr[i].x - 1][0]++;
+        vect[arr[i].y - 1][0]++;
+
+    }
+    for (int i = 0;i < n;i++) {
+        for (int j = 0;j < vect[i].size();j++) {
+            fout << vect[i][j]<<" ";
+        }
+        fout << endl;
+    }
+    delete[] arr;
+}
