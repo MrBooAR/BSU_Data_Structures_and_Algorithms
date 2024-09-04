@@ -1,0 +1,175 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+class Tree {
+	class Node {
+	public:
+		long long key;
+		Node* leftchild = nullptr;
+		Node* rightchild = nullptr;
+	};
+	Node* mainnode;
+	Node* root;
+public:
+	Tree() {
+		mainnode = nullptr;
+	}
+	~Tree() {
+		delete mainnode;
+	}
+	void insertnode(long long x) {
+		if (mainnode != nullptr) {
+			Node* parent = mainnode;
+			while (parent != nullptr) {
+				if (parent->key == x) {
+					parent = nullptr;
+				}
+				else if (x < parent->key) {
+					if (parent->leftchild != nullptr) {
+						parent = parent->leftchild;
+					}
+					else {
+						parent->leftchild = new Node;
+						parent->leftchild->key = x;
+						parent = nullptr;
+					}
+				}
+				else if (x > parent->key) {
+					if (parent->rightchild != nullptr) {
+						parent = parent->rightchild;
+					}
+					else {
+						parent->rightchild = new Node;
+						parent->rightchild->key = x;
+						parent = nullptr;
+					}
+				}
+			}
+		}
+		else if (mainnode == nullptr) {
+			mainnode = new Node;
+			mainnode->key = x;
+			root = mainnode;
+		}
+	}
+	friend std::ostream& operator<<(std::ostream& out, Tree& tree) {
+		Node* tempnode = tree.mainnode;
+		if (tempnode == nullptr) {
+			return out;
+		}
+		else {
+			out << tempnode->key << std::endl;
+			out << tempnode->leftchild;
+			out << tempnode->rightchild;
+		}
+		return out;
+	}
+	friend std::ostream& operator<<(std::ostream& out, Node* node) {
+		Node* tempnode = node;
+		if (tempnode == nullptr) {
+			return out;
+		}
+		else {
+			out << tempnode->key << std::endl;
+			out << tempnode->leftchild;
+			out << tempnode->rightchild;
+		}
+		return out;
+	}
+	void deletenodebyright(long long x) {
+		Node* temp = mainnode;
+		Node* parent = temp;
+		while (true) {
+			if (temp == nullptr) {
+				break;
+			}
+			else {
+				if (x < temp->key) {
+					parent = temp;
+					temp = temp->leftchild;
+				}
+				else if (x > temp->key) {
+					parent = temp;
+					temp = temp->rightchild;
+				}
+				else if (x == temp->key) {
+					break;
+				}
+			}
+		}
+		if (mainnode->leftchild == nullptr && mainnode->rightchild == nullptr && mainnode->key == x) {
+			mainnode = nullptr;
+		}
+		else if (mainnode->leftchild == nullptr && mainnode->rightchild != nullptr && mainnode->key == x) {
+			mainnode = mainnode->rightchild;
+		}
+		else if (mainnode->leftchild != nullptr && mainnode->rightchild == nullptr && mainnode->key == x) {
+			mainnode = mainnode->leftchild;
+		}
+		else if (temp != nullptr) {
+			Node* temp1 = temp;
+			Node* min_parent1 = temp1;
+			if (temp1->leftchild == nullptr && temp1->rightchild == nullptr) {
+				if (parent->leftchild != nullptr && parent->leftchild->key == x) {
+					parent->leftchild = nullptr;
+				}
+				else if (parent->rightchild != nullptr && parent->rightchild->key == x) {
+					parent->rightchild = nullptr;
+				}
+			}
+			else if (temp1->rightchild == nullptr && temp1->leftchild != nullptr) {
+				if (parent->leftchild != nullptr && parent->leftchild->key == x) {
+					parent->leftchild = temp1->leftchild;
+				}
+				else if (parent->rightchild != nullptr && parent->rightchild->key == x) {
+					parent->rightchild = temp1->leftchild;
+				}
+			}
+			else if (temp1->rightchild != nullptr && temp1->leftchild == nullptr) {
+				if (parent->leftchild != nullptr && parent->leftchild->key == x) {
+					parent->leftchild = temp1->rightchild;
+				}
+				else if (parent->rightchild != nullptr && parent->rightchild->key == x) {
+					parent->rightchild = temp1->rightchild;
+				}
+			}
+			else {
+				temp1 = temp1->rightchild;
+				if (temp1->leftchild == nullptr) {
+					temp->key = temp1->key;
+					temp->rightchild = temp1->rightchild;
+				}
+				else {
+					while (temp1->leftchild != nullptr) {
+						min_parent1 = temp1;
+						temp1 = temp1->leftchild;
+					}
+					temp->key = temp1->key;
+					if (temp1->rightchild == nullptr) {
+						min_parent1->leftchild = nullptr;
+					}
+					else {
+						min_parent1->leftchild = temp1->rightchild;
+					}
+				}
+			}
+		}
+	}
+};
+int main() {
+	Tree temptree;
+	long long x;
+	long long del;
+	fin >> del;
+	while (fin) {
+		fin >> x;
+		temptree.insertnode(x);
+	}
+	fin.close();
+	temptree.deletenodebyright(del);
+	fout << temptree;
+	fout.close();
+	return 0;
+}
