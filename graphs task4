@@ -1,0 +1,35 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+int main() {
+    int n;
+    fin >> n;
+    int* arr = new int[n];
+    vector<vector<int>> m1;
+    int tmp;
+    for (int i = 0;i < n;i++) {
+        vector<int> onetemple;
+        for (int j = 0;j < n;j++) {
+            fin >> tmp;
+            onetemple.push_back(tmp);
+        }
+        m1.push_back(onetemple);
+    }
+    for (int i = 0;i < n;i++) {
+        arr[i] = 0;
+    }
+    for (int i = 0;i < n;i++) {
+        for (int j = 0;j < n;j++) {
+            if (m1[i][j] == 1) {
+                arr[j] = i +1;
+            }
+        }
+    }
+    for (int i = 0;i < n;i++) {
+        fout << arr[i] << " ";
+    }
+    delete[] arr;
+}
