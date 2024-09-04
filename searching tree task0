@@ -1,0 +1,22 @@
+#include <iostream>
+#include <fstream>
+#include <set>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+int main() {
+	set<long long> roots;
+	long long temp = 0;
+	while (fin) {
+		fin >> temp;
+		roots.insert(temp);
+	}
+	fin.close();
+	long long sum = 0;
+	for (set<long long>::iterator i = roots.begin(); i != roots.end();i++) {
+		sum += *i;
+	}
+	fout << sum;
+	fout.close();
+	return 0;
+}
