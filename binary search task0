@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+struct bin
+{
+	int find;
+	int indexhe;
+	int indexhigh;
+};
+bin binarysearchf(int* arr,int key,int low,int high){
+	bin res;
+    bool tmp = false;
+    int index;
+    int indexhigh = high;
+    int size = high + 1;
+    res.find = 0;
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        if (arr[mid] < key) {
+            low = mid + 1;
+        }
+        else if (arr[mid] > key) {
+            high = mid - 1;
+            indexhigh = mid;
+            res.indexhe = indexhigh;
+            res.indexhigh = indexhigh;
+        }
+        else if (arr[mid] == key) {
+            if (tmp == false) {
+                tmp = true;
+                index = mid;
+            }
+            if(arr[mid] == arr[mid - 1]){
+                high = mid - 1;
+                index = mid;
+            }
+            else if (arr[index] == arr[index + 1]) {
+                index++;
+            }
+            else {
+                res.find = 1;
+                res.indexhe = mid;
+                res.indexhigh = index + 1;
+                return res;
+            }
+        }
+    }
+        if (arr[indexhigh] < key) {
+        res.indexhe = size;
+        res.indexhigh = size;
+        }
+    return res;
+}
+int comp(const int* i, const int* j)
+{
+    return *i - *j;
+}
+int main() {
+    int size;
+    cin >> size;
+    int* mainarr = new int[size];
+    for (int i = 0;i < size;i++) {
+        cin >> mainarr[i];
+    }
+    qsort(mainarr, size, sizeof(int), (int(*) (const void*, const void*)) comp);
+    int sizereq;
+    cin >> sizereq;
+    int* reqarr = new int[sizereq];
+    for (int i = 0;i < sizereq;i++) {
+        cin >> reqarr[i];
+    }
+    bin res;
+    for (int i = 0;i < sizereq;i++) {
+        res = binarysearchf(mainarr, reqarr[i], 0, size - 1);
+        cout << res.find << " " << res.indexhe << " " << res.indexhigh << endl;
+    }
+    delete[] mainarr;
+    delete[] reqarr;
+	return 0;
+}
