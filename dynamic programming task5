@@ -1,0 +1,82 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+void alloc1(int**& m1, int m, int n)
+{
+	m1 = new int* [m];
+	for (int i = 0;i < m;i++)
+		m1[i] = new int[n];
+}
+void free1(int** m1, int m, int n)
+{
+	for (int i = 0;i < m;i++)
+		delete[] m1[i];
+	delete[] m1;
+}
+int main() {
+	string str;
+	fin >> str;
+	int size = str.size();
+	int** F;
+	alloc1(F, size, size);
+	for (int i = 0;i < size;i++) {
+		for (int j = 0;j < size;j++) {
+			F[i][j] = 0;
+		}
+	}
+	for (int i = 0;i < size;i++) {
+		F[i][i] = 1;
+		if (i + 1 < size) {
+			if (str[i] == str[i + 1]) {
+				F[i][i + 1] = 2;
+			}
+			else {
+				F[i][i + 1] = 1;
+			}
+		}
+	}
+	for (int i = 0;i < size - 2;i++) {
+		int j = i + 2;
+		int k = i;
+		while (k >= 0) {
+			if (str[k] == str[j]) {
+				F[k][j] = F[k + 1][j - 1] + 2;
+			}
+			else {
+				F[k][j] = max(F[k + 1][j], F[k][j - 1]);
+			}
+			k--;
+		}
+	}
+	fout << F[0][size - 1] << endl;
+	string tmp;
+	int i = 0, j = size - 1;
+	while (i < size && j >= i ) {
+		if (str[i] == str[j]) {
+			tmp.push_back(str[i]);
+			i++;
+			j--;
+		}
+		else {
+			if (F[i + 1][j] < F[i][j - 1]) {
+				j--;
+			}
+			else if (F[i + 1][j] >= F[i][j - 1]) {
+				i++;
+			}
+		}
+	}
+	string res;
+	res = tmp;
+	for (int i = (F[0][size - 1])/2 - 1;i >= 0;i--) {
+		res.push_back(tmp[i]);
+	}
+	fout << res;
+	fin.close();
+	fout.close();
+	free1(F, size, size);
+	return 0;
+}
