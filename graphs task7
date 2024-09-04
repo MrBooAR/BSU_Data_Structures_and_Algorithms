@@ -1,0 +1,47 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <queue>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+int main() {
+    long long n, m;
+    fin >> n >> m;
+    long long v, w, p;
+    vector<vector<pair<long long,long long>>> matrix(n);
+    for (long long i = 0; i < m; i++) {
+        fin >> v >> w >> p;
+        pair<long long, long long> tmp;
+        tmp.first = p;
+        tmp.second = w;
+        matrix[v - 1].push_back(tmp);
+        tmp.second = v;
+        matrix[w - 1].push_back(tmp);
+    }
+    vector<bool> isvisited(n, false);
+    vector<long long> way(n, LLONG_MAX);
+    way[0] = 0;
+    priority_queue<pair<long long, long long>, vector<pair<long long, long long>>, greater<>> pairs;
+    pair<long long, long long> start;
+    start.first = way[0];
+    start.second = 0;
+    pairs.push(start);
+    while (pairs.empty() != true) {
+        pair<long long, long long> temp = pairs.top();
+        pairs.pop();
+        if (isvisited[temp.second] == false) {
+            isvisited[temp.second] = true;
+            way[temp.second] = temp.first;
+            for (pair<long long, long long> el : matrix[temp.second]) {
+                if (way[temp.second] + el.first < way[el.second - 1] && isvisited[el.second - 1] == false) {
+                    pair<long long, long long> count;
+                    count.first = way[temp.second] + el.first;
+                    count.second = el.second - 1;
+                    pairs.push(count);
+                }
+            }
+        }
+    }
+    fout << way[n - 1];
+}
