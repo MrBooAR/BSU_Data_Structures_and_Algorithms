@@ -1,0 +1,477 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <stack>
+using namespace std;
+ifstream fin("labyrinth.in.txt");
+ofstream fout("labyrinth.out.txt");
+struct cell {
+	int value;
+	int prevcell = 1;
+	bool exit = false;
+};
+struct person {
+	int value;
+	bool anyways = true;
+	bool exit = true;
+};
+struct pair_index {
+	int index_i;
+	int index_j;
+};
+pair_index funnextcell(int value,pair_index res) {
+	if (value == 0) {
+		res.index_i -= 1;
+		res.index_j -= 1;
+		return res;
+	}
+	else if (value == 1) {
+		res.index_i = res.index_i;
+		res.index_j -= 1;
+		return res;
+	}
+	else if (value == 2) {
+		res.index_i += 1;
+		res.index_j -= 1;
+		return res;
+	}
+	else if (value == 3) {
+		res.index_i += 1;
+		res.index_j = res.index_j;
+		return res;
+	}
+	else if (value == 4) {
+		res.index_i += 1;
+		res.index_j += 1;
+		return res;
+	}
+	else if (value == 5) {
+		res.index_i = res.index_i;
+		res.index_j += 1;
+		return res;
+	}
+	else if (value == 6) {
+		res.index_i -= 1;
+		res.index_j += 1;
+		return res;
+	}
+	else if (value == 7) {
+		res.index_i -= 1;
+		res.index_j = res.index_j;
+		return res;
+	}
+}
+int main() {
+	int n, m, k;
+	fin >> n >> m >> k;
+	person* arrin = new person[k];
+	int* arrout = new int[k];
+	int x;
+	person p;
+	for (int i = 0;i < k;i++) {
+		fin >> x;
+		p.value = x - 1;
+		arrin[i] = p;
+	}
+	for (int i = 0;i < k;i++) {
+		fin >> x;
+		arrout[i] = x - 1;
+	}
+	cell** labyrinth = new cell * [n];
+	for (int i = 0;i < n;i++) {
+		labyrinth[i] = new cell[m];
+	}
+	cell X;
+	for (int i = 0;i < n;i++) {
+		for (int j = 0;j < m;j++) {
+			fin >> x;
+			X.value = x;
+			labyrinth[i][j] = X;
+		}
+	}
+	for (int i = 0;i < k;i++) {
+		labyrinth[n-1][arrout[i]].exit = true;
+	}
+	for (int i = 0;i < k;i++) {
+		labyrinth[0][arrin[i].value].value = i + 2;
+		labyrinth[0][arrin[i].value].prevcell = 1;
+	}
+	int count = 0;
+	for (int u = 0;u < k;u++) {
+		stack<pair_index> way;
+		stack<pair_index> resultway;
+		pair_index pair_indexes;
+		pair_index tmp;
+		pair_index tempindexes;
+		pair_indexes.index_i = 0;
+		pair_indexes.index_j = arrin[u].value;
+		tmp = pair_indexes;
+		int anyways = 0;
+		bool f = true;
+		pair_index ret = pair_indexes;
+		tempindexes = pair_indexes;
+		way.push(tempindexes);
+		resultway.push(tempindexes);
+		while ((arrin[u].exit == false || arrin[u].anyways == false) != true) {
+			pair_indexes = ret;
+			if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 0) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 1) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 2) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 3) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 4) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 5) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 6) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			else if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell == 7) {
+				if (labyrinth[pair_indexes.index_i][pair_indexes.index_j].exit != true) {
+					int v = labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell;
+					int ind = 0;
+					while (ind < 8) {
+						tmp = funnextcell(v, tmp);
+						if (tmp.index_i >= 0 && tmp.index_j >= 0 &&
+							tmp.index_i < n && tmp.index_j < m) {
+							if ((labyrinth[tmp.index_i][tmp.index_j].value == 0 ||
+								labyrinth[tmp.index_i][tmp.index_j].exit == true) == true) {
+								pair_indexes = tmp;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].value = u + 2;
+								v = (v + 5) % 8;
+								labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = v;
+								arrin[u].anyways = true;
+								ind = 8;
+								tempindexes = pair_indexes;
+								way.push(tempindexes);
+								resultway.push(tempindexes);
+							}
+							else {
+								tmp = pair_indexes;
+								v = (v + 1) % 8;
+								arrin[u].anyways = false;
+								ind++;
+							}
+						}
+						else {
+							tmp = pair_indexes;
+							v = (v + 1) % 8;
+							ind++;
+						}
+					}
+				}
+				else {
+					arrin[u].exit = false;
+				}
+				ret = pair_indexes;
+			}
+			if (arrin[u].anyways == false) {
+				if (pair_indexes.index_i != 0 || pair_indexes.index_j != arrin[u].value) {
+					pair_index tempind = way.top();
+					ret = tempind;
+					way.pop();
+					labyrinth[tempind.index_i][tempind.index_j].prevcell = (labyrinth[tempind.index_i][tempind.index_j].prevcell + 1) % 8;
+					arrin[u].anyways = true;
+				}
+				else {
+					if (f != false) {
+						labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell = (labyrinth[pair_indexes.index_i][pair_indexes.index_j].prevcell + 1) % 8;
+						f = false;
+						arrin[u].anyways = true;
+						anyways++;
+					}
+					else {
+						anyways = 7;
+					}
+				}
+			}
+		}
+		if (anyways == 7) {
+			arrin[u].anyways = false;
+			for (int i = 0;i < resultway.size() + 1;i++) {
+				tmp = resultway.top();
+				resultway.pop();
+				labyrinth[tmp.index_i][tmp.index_j].value = 0;
+			}
+		}
+	}
+	for (int u = 0;u < k;u++) {
+		if (arrin[u].exit == false)
+		{
+			count++;
+		}
+	}
+	fout << count << endl;
+	for (int i = 0;i < n;i++) {
+		for (int j = 0;j < m;j++) {
+			fout << labyrinth[i][j].value << " ";
+		}
+		fout << endl;
+	}
+	delete[] arrin;
+	delete[] arrout;
+	for (int i = 0;i < n;i++)
+		delete[] labyrinth[i];
+	delete[] labyrinth;
+}
