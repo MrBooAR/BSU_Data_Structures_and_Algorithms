@@ -1,0 +1,103 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <map>
+#include<queue>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+bool det(pair<int, int> firstcoord, pair<int, int> secondcoord, pair<int, int> thirdcoord) {
+	double res = firstcoord.first * (secondcoord.second * 1 - thirdcoord.second * 1) -
+		firstcoord.second * (secondcoord.first * 1 - thirdcoord.first * 1) +
+		1 * (secondcoord.first * thirdcoord.second - thirdcoord.first * secondcoord.second);
+	if (res > 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+int main() {
+	int n, m, k;
+	fin >> n >> m >> k;
+	vector<pair<int, int>> koordvec(n + 1);
+	for (int i = 1;i < n + 1;i++) {
+		pair<int, int> temp;
+		fin >> temp.first >> temp.second;
+		koordvec[i] = temp;
+	}
+	vector<vector<int>> matrix(n + 1,vector<int>(n + 1,-5));
+	vector<vector<int>> counterroads(n + 1);
+	for (int i = 0;i < m;i++) {
+		int x, y, z;
+		fin >> x >> y >> z;
+		matrix[x][y] = z;
+		matrix[y][x] = z;
+		counterroads[x].push_back(y);
+		counterroads[y].push_back(x);
+	}
+	int start, finish;
+	fin >> start >> finish;
+	matrix[0][start] = 0;
+	koordvec[0] = make_pair(koordvec[start].first, koordvec[start].second - 1);
+	vector<int> way(n + 1, INT_MAX);
+	way[0] = 0;
+	priority_queue<vector<int>, vector<vector<int>>, greater<>> pairs;
+	vector<int> startv(4);
+	startv[0] = way[0];
+	startv[1] = 0;
+	startv[2] = start;
+	startv[3] = start;
+	pairs.push(startv);
+	while (pairs.empty() != true) {
+		vector<int> temp = pairs.top();
+		pairs.pop();
+		if (matrix[temp[1]][temp[2]] != -1) {
+			matrix[temp[1]][temp[2]] = -1;
+			way[temp[2]] = temp[0];
+			for (int j = 1;j < n + 1;j++) {
+				if (j != temp[1]) {
+					if (det(koordvec[temp[1]], koordvec[temp[2]],koordvec[j]) == true && temp[1] != 0) {
+						if (way[temp[2]] + matrix[temp[2]][j] + (counterroads[temp[2]].size() * k) < way[j]
+							&& matrix[temp[2]][j] != -5) {
+							vector<int> count(4);
+							count[0] = way[temp[2]] + matrix[temp[2]][j] + (counterroads[temp[2]].size() * k);
+							count[1] = temp[2];
+							count[2] = j;
+							count[3] = temp[1];
+							pairs.push(count);
+						}
+					}
+					else {
+						if (way[temp[2]] + matrix[temp[2]][j] < way[j]
+							&& matrix[temp[2]][j] != -5) {
+							vector<int> count(4);
+							count[0] = way[temp[2]] + matrix[temp[2]][j];
+							count[1] = temp[2];
+							count[2] = j;
+							count[3] = temp[1];
+							pairs.push(count);
+						}
+					}
+				}
+				else {
+					if (matrix[temp[2]][j] != -5) {
+						vector<int> count(4);
+						count[0] = way[temp[2]] + matrix[temp[2]][j] + (counterroads[temp[2]].size() * k);
+						count[1] = temp[2];
+						count[2] = j;
+						count[3] = temp[1];
+						pairs.push(count);
+					}
+				}
+			}
+		}
+	}
+	if (way[finish] != INT_MAX) {
+		fout << "Yes" << endl;
+		fout << way[finish];
+	}
+	else {
+		fout << "No";
+	}
+}
