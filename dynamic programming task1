@@ -1,0 +1,77 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+struct pairnm
+{
+    int n;
+    int m;
+    pairnm() {
+        n = 0;
+        m = 0;
+    }
+    pairnm(int n1, int m1){
+        n = n1;
+        m = m1;
+    }
+};
+int func1(pairnm* dimarr, int size)
+{
+    int result = -1;
+    int** matrix = new int* [size];
+    for (int i = 0; i < size; i++)
+    {
+        matrix[i] = new int[size];
+    }
+    for (int j = 0; j < size; j++)
+    {
+        for (int i = j; i >= 0; i--)
+        {
+            if (i == j)
+            {
+                matrix[i][j] = 0;
+            }
+            else if (j - i == 1)
+            {
+                matrix[i][j] = dimarr[j - 1].n * dimarr[j - 1].m * dimarr[j].m;
+            }
+            else
+            {
+                int tmp = 1;
+                matrix[i][j] = INT_MAX;
+                for (int k = i; k < j; k++)
+                {
+                    tmp = matrix[i][k] + matrix[k + 1][j] + dimarr[i].n * dimarr[k].m * dimarr[j].m;
+                    if (tmp < matrix[i][j])
+                    {
+                        matrix[i][j] = tmp;
+                    }
+                }
+            }
+        }
+    }
+    result = matrix[0][size - 1];
+    delete[] matrix;
+    return result;
+}
+int main()
+{
+    int size = 0;
+    pairnm* arr = nullptr;
+    fin >> size;
+    arr = new pairnm[size];
+    for (int i = 0; i < size; i++)
+    {
+        int tmp_n;
+        int tmp_m;
+        fin >> tmp_n >> tmp_m;
+        arr[i] = pairnm(tmp_n, tmp_m);
+    }
+    int result = func1(arr, size);
+    fout << result;
+    fin.close();
+    fout.close();
+    delete[] arr;
+    return 0;
+}
