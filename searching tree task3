@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+using namespace std;
+ifstream fin;
+ofstream fout;
+struct solutionnode {
+public:
+	int key;
+	int min;
+	int max;
+	solutionnode(int new_key, int new_min, int new_max) {
+		this->key = new_key;
+		this->min = new_min;
+		this->max = new_max;
+	}
+	solutionnode() {
+		key = 0;
+		min = INT_MIN;
+		max = INT_MAX;
+	}
+};
+int main() {
+	int n;
+	fin.open("bst.in");
+	if (fin.is_open()) {
+		fout.open("bst.out");
+		fin >> n;
+		solutionnode* arr = new solutionnode[n];
+		string str;
+		fin >> str;
+		arr[0].key = stoi(str);
+		int i = 1;
+		while (!fin.eof()) {
+			if (i == n) {
+				fout << "YES";
+				return 0;
+			}
+			fin >> str;
+			arr[i].key = stoi(str);
+			fin >> str;
+			int j = stoi(str);
+			fin >> str;
+			string tmp = str;
+			if (tmp == "R")
+				if ((arr[i].key < arr[j - 1].max || arr[i].key == INT_MAX && arr[j - 1].max == INT_MAX) && arr[i].key >= arr[j - 1].key) {
+					arr[i].min = arr[j - 1].key;
+					arr[i].max = arr[j - 1].max;
+				}
+				else {
+					fout << "NO";
+					return 0;
+				}
+			if (tmp == "L")
+				if (arr[i].key >= arr[j - 1].min && arr[i].key < arr[j - 1].key) {
+					arr[i].min = arr[j - 1].min;
+					arr[i].max = arr[j - 1].key;
+				}
+				else {
+					fout << "NO";
+					return 0;
+				}
+			i++;
+		}
+	}
+	fout.close();
+	fin.close();
+	return 0;
+}
