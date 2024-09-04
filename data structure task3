@@ -1,0 +1,51 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+long long hashfun(long long x, long long i, long long c , long long m) {
+	return ((x % m) + c * i) % m;
+}
+int main() {
+	long long m, n, c;
+	fin >> m >> c >> n;
+	long long* hash = new long long[m];
+	for (long long i = 0;i < m;i++) {
+		hash[i] = -1;
+	}
+	if (n != 0) {
+		long long tmp;
+		long long index;
+		long long k = 0;
+		for (long long i = 0;i < n;i++) {
+			fin >> tmp;
+			k = 0;
+			index = hashfun(tmp, k, c, m);
+			if (hash[index] == -1) {
+				hash[index] = tmp;
+			}
+			else {
+				while (hash[index] != -1) {
+						index = hashfun(tmp, k, c, m);
+						if (hash[index] == tmp) {
+							break;
+						}
+						k++;
+				}
+				if (hash[index] != tmp) {
+					hash[index] = tmp;
+				}
+			}
+		}
+		for (long long i = 0;i < m;i++) {
+			fout << hash[i] << " ";
+		}
+		delete[] hash;
+	}
+	else {
+		for (long long i = 0;i < m;i++) {
+			fout << hash[i] << " ";
+		}
+		delete[] hash;
+	}
+}
