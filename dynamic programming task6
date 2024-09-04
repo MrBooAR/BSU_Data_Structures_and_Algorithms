@@ -1,0 +1,57 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+ifstream fin("in.txt");
+ofstream fout("out.txt");
+void alloc1(int**& m1, int m, int n)
+{
+	m1 = new int* [m];
+	for (int i = 0;i < m;i++)
+		m1[i] = new int[n];
+}
+void free1(int** m1, int m, int n)
+{
+	for (int i = 0;i < m;i++)
+		delete[] m1[i];
+	delete[] m1;
+}
+int main() {
+	int pendel;
+	int penins;
+	int penrem;
+	fin >> pendel;
+	fin >> penins;
+	fin >> penrem;
+	string str1, str2;
+	fin >> str1;
+	fin >> str2;
+	int** F;
+	alloc1(F, str1.size() + 1, str2.size() + 1);
+	for (int i = 0;i < str1.size() + 1;i++) {
+		F[i][0] = i * pendel;
+	}
+	for (int j = 0;j < str2.size() + 1;j++) {
+		F[0][j] = j * penins;
+	}
+	int minD, minI, minR, delta, mintmp;
+	for (int i = 1;i < str1.size() + 1;i++) {
+		for (int j = 1;j < str2.size() + 1;j++) {
+			minD = F[i - 1][j] + pendel;
+			minI = F[i][j - 1] + penins;
+			if (str1[i - 1] == str2[j - 1]) {
+				delta = 0;
+			}
+			else { 
+				delta = 1; 
+			}
+			minR = F[i - 1][j - 1] + delta * penrem;
+			mintmp = min(minD, minI);
+			F[i][j] = min(mintmp, minR);
+		}
+	}
+	fout << F[str1.size()][str2.size()];
+	fin.close();
+	fout.close();
+	free1(F, str1.size(), str2.size());
+	return 0;
+}
