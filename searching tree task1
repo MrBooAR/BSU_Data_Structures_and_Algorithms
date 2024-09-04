@@ -1,0 +1,91 @@
+#include <iostream>
+#include <fstream>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+class Tree {
+	class Node {
+	public:
+		long long key;
+		Node* leftchild = nullptr;
+		Node* rightchild = nullptr;
+	};
+	Node* mainnode;
+public:
+	Tree() {
+		mainnode = nullptr;
+	}
+	~Tree() {
+		delete mainnode;
+	}
+	void insertnode(long long x) {
+		if(mainnode != nullptr) {
+			Node* parent = mainnode;
+			while (parent != nullptr) {
+				if (parent->key == x) {
+					parent = nullptr;
+				}
+				else if (x < parent->key) {
+					if (parent->leftchild != nullptr) {
+						parent = parent->leftchild;
+					}
+					else {
+						parent->leftchild = new Node;
+						parent->leftchild->key = x;
+						parent = nullptr;
+					}
+				}
+				else if(x > parent->key){
+					if (parent->rightchild != nullptr) {
+						parent = parent->rightchild;
+					}
+					else {
+						parent->rightchild = new Node;
+						parent->rightchild->key = x;
+						parent = nullptr;
+					}
+				}
+			}
+		}
+		else if (mainnode == nullptr) {
+			mainnode = new Node;
+			mainnode->key = x;
+		}
+	}
+	friend std::ostream& operator<<(std::ostream& out, Tree& tree) {
+		Node* tempnode = tree.mainnode;
+		if (tempnode == nullptr) {
+			return out;
+		}
+		else {
+			out << tempnode->key << std::endl;
+			out << tempnode->leftchild;
+			out << tempnode->rightchild;
+		}
+		return out;
+	}
+	friend std::ostream& operator<<(std::ostream& out, Node* node) {
+		Node* tempnode = node;
+		if (tempnode == nullptr) {
+			return out;
+		}
+		else {
+			out << tempnode->key << std::endl;
+			out << tempnode->leftchild;
+			out << tempnode->rightchild;
+		}
+		return out;
+	}
+};
+int main() {
+	Tree temptree;
+	long long x;
+	while (fin) {
+		fin >> x;
+		temptree.insertnode(x);
+	}
+	fin.close();
+	fout << temptree;
+	fout.close();
+	return 0;
+}
