@@ -1,0 +1,121 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+ifstream fin("input.txt");
+ofstream fout("output.txt");
+struct pairxy
+{
+    long long x;
+    long long y;
+    pairxy() {
+        x = 0;
+        y = 0;
+    }
+    pairxy(long long n1, long long m1) {
+        x = n1;
+        y = m1;
+    }
+};
+class DSU {
+    int* parent;
+    int* size;
+    int number;
+public:
+    DSU(int n) {
+        parent = new int[n];
+        size = new int[n];
+        for (int i = 0;i < n;i++) {
+            parent[i] = i + 1;
+            size[i] = 1;
+        }
+        number = n;
+    }
+    int findroot(int x) {
+        if (parent[x - 1] != x) {
+            parent[x-1] = findroot(parent[x - 1]);
+            return parent[x - 1];
+        }
+        else {
+            return x;
+        }
+    }
+    void Union(int x, int y) {
+        int rootx = findroot(x);
+        int rooty = findroot(y);
+        if (rootx != rooty) {
+            if (size[rootx - 1] > size[rooty - 1]) {
+                parent[rooty - 1] = rootx;
+                size[rootx - 1] += size[rooty - 1];
+                number--;
+            }
+            else {
+                parent[rootx - 1] = rooty;
+                size[rooty - 1] += size[rootx - 1];
+                number--;
+            }
+        }
+    }
+    void print(int n) {
+        for (int i = 0;i < n;i++) {
+            cout << parent[i] << " ";
+        }
+    }
+    int getnumber() {
+        return number;
+    }
+    ~DSU() {
+        delete[] parent;
+        delete[] size;
+    }
+};
+int main() {
+    long long n, m, q;
+    fin >> n >> m >> q;
+    DSU arrdsu = DSU(n);
+    pairxy* arrpair = new pairxy[m];
+    long long* arrdel = new long long[q];
+    for (long long i = 0;i < m;i++) {
+        fin >> arrpair[i].x >> arrpair[i].y;
+    }
+    for (long long i = 0;i < q;i++) {
+        fin >> arrdel[i];
+    }
+    bool* arrb = new bool[m];
+    for (int i = 0;i < m;i++) {
+        arrb[i] = false;
+    }
+    for (int i = 0;i < q;i++) {
+        arrb[arrdel[i] - 1] = true;
+    }
+    for (int i = 0;i < m;i++) {
+        if (arrb[i] == false) {
+            arrdsu.Union(arrpair[i].x, arrpair[i].y);
+        }
+    }
+    string strres = "";
+    for (int i = q - 1;i >= 0;i--) {
+        int tmpnumber = arrdsu.getnumber();
+        arrdsu.Union(arrpair[arrdel[i] - 1].x, arrpair[arrdel[i]-1].y);
+        if (arrdsu.getnumber() == 1) {
+            if (tmpnumber == arrdsu.getnumber()) {
+                strres += "1";
+            }
+            else {
+                strres += "0";
+            }
+            for (int j = 0;j < i;j++) {
+                strres += "1";
+            }
+            break;
+        }
+        else {
+            strres += "0";
+        }
+    }
+    reverse(strres.begin(), strres.end());
+    fout << strres;
+    delete[] arrb;
+    delete[] arrdel;
+    delete[] arrpair;
+}
