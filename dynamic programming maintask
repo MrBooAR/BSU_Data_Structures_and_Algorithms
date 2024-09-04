@@ -1,0 +1,106 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <set>
+using namespace std;
+ifstream fin("input1.txt");
+ofstream fout("output.txt");
+bool compare(int x1, int x2)
+{
+	return (x1 < x2);
+}
+bool comparevec(vector<int> vec1, vector<int> vec2) {
+	return(vec1 < vec2);
+}
+struct pairofvector {
+	int value;
+	int index_i;
+};
+bool operator<(pairofvector a, pairofvector b)
+{
+	return(a.value < b.value);
+}
+int main() {
+	int n, m;
+	fin >> n >> m;
+	vector<vector<int>> seqofvec;
+	int tmp;
+	for (int i = 0;i < m;i++) {
+		vector<int> onetemple;
+		for (int j = 0;j < n;j++) {
+			fin >> tmp;
+			onetemple.push_back(tmp);
+		}
+		seqofvec.push_back(onetemple);
+	}
+	for (int i = 0;i < m;i++) {
+		sort(seqofvec[i].begin(), seqofvec[i].end(), compare);
+	}
+	sort(seqofvec.begin(), seqofvec.end(), comparevec);
+	for (int i = 0;i < m;i++) {
+		for (int j = 0;j < n;j++) {
+			cout << seqofvec[i][j] << " ";
+		}
+		cout << endl;
+	}
+	if (m == 1) {
+		fout << 1;
+	}
+	else {
+		multiset<pairofvector> results;
+		pairofvector tmp;
+		tmp.index_i = 0;
+		tmp.value = 1;
+		results.insert(tmp);
+		bool func = false;
+		pairofvector res;
+		for (int j = 0;j < n;j++) {
+			if (seqofvec[tmp.index_i][j] <= seqofvec[1][j]) {
+				func = true;
+			}
+			else {
+				func = false;
+			}
+		}
+		if (func == true) {
+			res.index_i = 1;
+			res.value = tmp.value + 1;
+		}
+		else {
+			res.index_i = 1;
+			res.value = 1;
+		}
+		results.insert(res);
+		for (int i = 2;i < m;i++) {
+			func = false;
+			multiset<pairofvector>::iterator itr = results.end();
+			--itr;
+			while ((itr == --results.begin() || func == true) == false) {
+				for (int j = 0;j < n;j++) {
+					if (seqofvec[(*itr).index_i][j] <= seqofvec[i][j]) {
+						func = true;
+					}
+					else {
+						func = false;
+						break;
+					}
+				}
+				if (func == false) {
+					--itr;
+				}
+			}
+			if (func == true) {
+				res.index_i = i;
+				res.value = (*itr).value + 1;
+			}
+			else {
+				res.index_i = i;
+				res.value = 1;
+			}
+			results.insert(res);
+		}
+		pairofvector result = *(--results.end());
+		fout << result.value;
+	}
+}
